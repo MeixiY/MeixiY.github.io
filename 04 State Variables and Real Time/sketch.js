@@ -25,6 +25,7 @@ function setup() {
 function draw() {
   background(220);
   drawShape();
+  manageTime();
 
 }
 
@@ -69,7 +70,7 @@ function drawShape(){
       for(let i = 0; i < 30; i++){
         let x2 = random(x-80, x+80);
         let y2 = random(y-80, y+80);
-        line(x, y, x2, y2),
+        line(x, y, x2, y2);
       }
       break;
   }

@@ -11,10 +11,12 @@ let x2 = 500;
 let y2 = 120;
 let circleD = 100
 
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   circleX = width/2;
   circleY = height/2;
+  
 }
 
 function dayScene() {
@@ -87,6 +89,16 @@ function charBot(){
   circle(circleX + 27, circleY, 10);
   stroke(0);
   line(circleX - 20, circleY + 22, circleX + 20, circleY + 22);
+  
+}
+
+function moveBot(){
+  if (keyIsDown(LEFT_ARROW)){
+    circleX -= 10;
+  }
+    else if (keyIsDown(RIGHT_ARROW)){
+    circleX += 10;
+  }
 }
 
 function draw() {

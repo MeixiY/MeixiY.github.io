@@ -9,7 +9,8 @@ let currentX = 50;
 let currentY = 120;
 let x2 = 500;
 let y2 = 120;
-let circleD = 100
+let circleD = 100;
+let backNum = 0;
 
 
 function setup() {
@@ -77,7 +78,10 @@ function clouds(x, y) {
 
 function charBot(){
   noStroke();
-  fill("white");
+  if(keyIsDown(82)){
+    fill("white");
+  }
+  else fill(mouseX, mouseY, 20);
   circle(circleX, circleY, circleD);
   rect(circleX - circleD/2, circleY, circleD, 100);
   triangle(circleX-50, circleY+100, circleX-25, circleY+100, circleX-37.5, circleY+133.3);
@@ -96,13 +100,38 @@ function moveBot(){
   if (keyIsDown(LEFT_ARROW)){
     circleX -= 10;
   }
-    else if (keyIsDown(RIGHT_ARROW)){
+  else if (keyIsDown(RIGHT_ARROW)){
     circleX += 10;
   }
 }
 
+function currentBack(){
+  switch(backNum){
+    case 0:
+      dayScene();
+      break;
+    case 1:
+      nightScene();
+      break;
+
+  }
+}
+
+function keyPressed(){
+  changeBack();
+
+}
+function changeBack(){
+  backNum += 1; 
+  if(backNum > 0){
+    backNum = 0;
+  }
+}
+
+
 function draw() {
   background(220);
-  dayScene();
+  currentBack();
   charBot();
+  moveBot();
 }

@@ -76,12 +76,26 @@ function clouds(x, y) {
   circle(x + 80, y - 10, 50);
 }
 
-function charBot(){
-  noStroke();
+function botColor(){
+  let c1 = mouseX; let c2 = mouseY;
+  c1 = map(c1, 0, width, 0, 255)
+  c2 = map(c2, 0, height, 0, 255);
+
   if(keyIsDown(82)){
     fill("white");
   }
-  else fill(mouseX, mouseY, 20);
+  else fill(c1, c2, 20);
+
+}
+
+
+function charBot(){
+  noStroke();
+  //if(keyIsDown(82)){
+  //  fill("white");
+  //}
+  //else fill(mouseX, mouseY, 20);
+  botColor();
   circle(circleX, circleY, circleD);
   rect(circleX - circleD/2, circleY, circleD, 100);
   triangle(circleX-50, circleY+100, circleX-25, circleY+100, circleX-37.5, circleY+133.3);
@@ -106,6 +120,7 @@ function moveBot(){
 }
 
 function currentBack(){
+  changeBack();
   switch(backNum){
     case 0:
       dayScene();
@@ -116,6 +131,8 @@ function currentBack(){
 
   }
 }
+
+
 
 function keyPressed(){
   changeBack();
@@ -130,7 +147,6 @@ function changeBack(){
 
 
 function draw() {
-  background(220);
   currentBack();
   charBot();
   moveBot();

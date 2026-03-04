@@ -1,9 +1,7 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// Interactive Scene
+// Meixi Yao
+// March 4th, 2026
+
 
 
 // Global Variable Section

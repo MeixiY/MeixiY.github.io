@@ -11,8 +11,10 @@ let currentX = 50;
 let currentY = 120;
 let x2 = 500;
 let y2 = 120;
-let circleD = 100;
 let backNum = 0;
+let circleX; let circleY;
+
+// Operater for tying a mouse click to a function
 document.onmousedown = click;
 
 
@@ -101,7 +103,7 @@ fill("Khaki");
 rect(0, 0, width, (height / 3) * 2);
 fill(255, 140, 0);
 circle((width / 8) * 7, (height / 8), 150);
-pyramid();
+pyramid(); // Calls function for drawing pyramids
 }
 
 // Draws the two pyramids
@@ -117,13 +119,28 @@ function pyramid(){
 // Scene #4 - At Sea
 function atSea(){
   noStroke()
-  fill("darkblue");
-  rect(0, (height / 3) * 2, width, height / 3);
   fill("skyblue");
   rect(0, 0, width, (height / 3) * 2);
+  fill("Burlywood");
+  ellipse(200, (height/5)*3.5, 400, 200);
+  fill("darkblue");
+  rect(0, (height / 3) * 2, width, height / 3);
   fill("yellow");
   circle((width / 8) * 7, (height / 8), 150);
+  stroke(139, 69, 19);
+  strokeWeight(5);
+  line(200, (height/5)*3.5 - 102, 200, (height/5)*3.5 - 250);
+  noStroke();
+  fill("red");
+  triangle(201, (height/5)*3.5-200, 201, (height/5)*3.5-250, 250, (height/5)*3.5-225);
+  strokeWeight(1);
+}
 
+
+
+// Display name on bottom right corner
+function artistSign(){
+  text("Meixi", width - 50, height - 10);
 }
 
 
@@ -148,8 +165,8 @@ function botColor(){
 function charBot(){
   noStroke();
   botColor();
-  circle(circleX, circleY, circleD);
-  rect(circleX - circleD/2, circleY, circleD, 100);
+  circle(circleX, circleY, 100);
+  rect(circleX - 50, circleY, 100, 100)
   triangle(circleX-50, circleY+99.5, circleX-25, circleY+99.5, circleX-37.5, circleY+133.3);
   triangle(circleX-25, circleY+99.5, circleX, circleY+99.5, circleX-12.5, circleY+133.3);
   triangle(circleX, circleY+99.5, circleX+25, circleY+99.5, circleX+12.5, circleY+133.3);
@@ -186,6 +203,10 @@ function currentBack(){
       break;
     case 2:
       desert();
+      break;
+    case 3:
+      atSea();
+      break;
 
   }
 }
@@ -202,15 +223,15 @@ function click(event){
 // Update backNum by 1 when called, wrap back to 0 if over 3
 function changeBack(){
   backNum += 1; 
-  if(backNum > 2){
+  if(backNum > 3){
     backNum = 0;
   }
 }
 
 
 function draw() {
-  atSea();
-  //currentBack();
+  currentBack();
+  artistSign();
   charBot();
   moveBot();
 }

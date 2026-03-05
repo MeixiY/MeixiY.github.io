@@ -8,9 +8,11 @@
 
 let rectWidth = 5; 
 let rectHeight;
+let highestX; let highestY = 0;
+
 
 // Variables for using noise()
-let noiseTime = random(100); let noiseSpeed = 0.02
+let noiseTime = 12; let noiseSpeed = 0.01;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -18,27 +20,47 @@ function setup() {
 }
 
 function generateTerrain(){
-  rectHeight = noise(noiseTime)
-  rectHeight = map(rectHeight, 0, 1, 0, height*0.75);
-  //using a loop, construct a number
-  //of side by side rectangles of 
-  //random height, to be 2D terrain
-  for(let x = 0; x < width; x+=rectWidth){
-    //generate random() (negative) height
-    //eventually replace this with using noise()
-    //let rectHeight = random(0, height*0.75);
+  
+
+  for(let x = 0; x <= width; x+=rectWidth){
+  
+    rectHeight = noise(noiseTime)
+    rectHeight = map(rectHeight, 0, 1, 0, height*0.75);
     
     
     rect(x,height,rectWidth,-rectHeight);
-    rectHeight += noiseTime + noiseSpeed;
+    noiseTime += noiseSpeed;
+
+    if(rectHeight > highestY){
+    highestY = rectHeight;
+    highestX = x
+    drawFlag(highestX, highestY);
+    }
   }
+
+  if(keyIsDown(LEFT_ARROW)){
+    rectWidth -= 0.5;
+  }
+  if(keyIsDown(RIGHT_ARROW)){
+    rectWidth += 0.5;
+  }
+  rectWidth = constrain(rectWidth, 1, 50);
+  
+  
 }
 
+
+
+function drawFlag(x_,y){
+  strokeWeight(3);
+  line(x_, y, x_, y-20);
+  triangle(x_, y-20, x_+6, y-16, x_, y-12);
+}
+
+
+
 function draw() {
-  //stabilize my random values once per frame
-  //this needs to get adapted for noise() once
-  //we switch out of random.
-  randomSeed(25);
+  noiseTime = 12
 
 
   background(220);

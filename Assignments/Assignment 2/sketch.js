@@ -21,7 +21,7 @@ function setup() {
 
 function generateTerrain(){
   
-
+highestX =0; highestY = 0;
   for(let x = 0; x <= width; x+=rectWidth){
   
     rectHeight = noise(noiseTime)
@@ -34,7 +34,7 @@ function generateTerrain(){
     if(rectHeight > highestY){
     highestY = rectHeight;
     highestX = x
-    drawFlag(highestX, highestY);
+    
     }
   }
 
@@ -46,15 +46,17 @@ function generateTerrain(){
   }
   rectWidth = constrain(rectWidth, 1, 50);
   
-  
+  drawFlag(highestX, height-highestY);
 }
 
 
 
 function drawFlag(x_,y){
+  stroke("red")
   strokeWeight(3);
   line(x_, y, x_, y-20);
   triangle(x_, y-20, x_+6, y-16, x_, y-12);
+  stroke(0);
 }
 
 

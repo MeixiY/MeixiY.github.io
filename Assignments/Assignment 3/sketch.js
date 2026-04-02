@@ -145,11 +145,13 @@ class Vehicle{
   }
 }
 
-//function keyPressed(){
-//  if(keyCode === 32){
-//     for(frameCount <= 120)   
-//  }
-//}
+function keyPressed(){
+  if(keyCode === 32){
+    if(frameCount <= 120){
+
+     }   
+  }
+}
 
 class TrafficLight{
   constructor(){

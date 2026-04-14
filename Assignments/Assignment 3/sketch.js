@@ -9,6 +9,7 @@ let vehicle;
 let lightColor;
 let eastbound = [];
 let westbound = [];
+let traffic;
 
 
 function setup() {
@@ -21,6 +22,8 @@ function setup() {
   for(let i = 0; i < 20; i++){
     eastbound.push(new Vehicle(0));
   }
+
+  traffic = new TrafficLight();
 }
 
 function draw() {
@@ -131,7 +134,9 @@ class Vehicle{
 
   action(){
     this.display();
-    this.move();
+    if(traffic.light === 0){
+      this.move();
+    }
     let choice = Math.round(random(100));
     if(choice === 1){
       this.changeColor();
@@ -147,18 +152,27 @@ class Vehicle{
 
 function keyPressed(){
   if(keyCode === 32){
-    if(frameCount <= 120){
-
+    if(traffic.light === 0){
+        traffic.turnRed();
      }   
   }
 }
 
 class TrafficLight{
   constructor(){
-    this.light = lightColor;
+    this.light = 0;
+    this.counter = 0;
   }
 
-  redGreen(){
-    
+  turnRed(){
+    this.light = 1;
+    this.counter = 120;
+    }
+
+  checkLight(){
+    if(this.light === 1)
+        this.counter =- 1;
+    if(this.counter === 0)
+      this.light =  0;
     }
   }

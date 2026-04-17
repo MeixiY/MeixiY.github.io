@@ -17,10 +17,12 @@ let blackWhite = []
 let rows = grid.length;
 let cols = grid[0].length;
 let tileSize = 60;
+let num;
 
 
 function setup() {
   createCanvas(cols*tileSize, rows*tileSize);
+  //randomStart();
 }
 
 function draw() {
@@ -30,6 +32,7 @@ function draw() {
   fill(255, 0, 0);
   text(getCurrentX() + "," + getCurrentY(), mouseX, mouseY);
   gameWin();
+  hover();
 }
 
 function flip(x, y){
@@ -111,5 +114,41 @@ function checkTileWhite(num){
 
 
 function randomStart(){
-  let num = random(1)
+  for(let g = 0; g < grid.length; g++){
+    for(let i = 0; i < grid[0].length; i++){
+      num = Math.round(random(0,1));
+      if(num === 0){
+        grid[g][i] = 0;
+        }
+      else if(num === 1);{
+        grid[g][i] = 255;
+      }
+      num = Math.round(random(0,1));
+      
+    }
+  }
+}
+
+function hover(){
+  let x = getCurrentX();
+  let y = getCurrentY();
+  let c = color(180, 255, 180);
+  
+  c.setAlpha(150);
+  fill(c);
+  square(x*tileSize, y*tileSize, tileSize);
+  if(keyIsDown(SHIFT)){
+    square(x, y, tileSize);
+    }
+  else{
+    //ALWAYS:
+    square(x*tileSize, y*tileSize, tileSize);
+
+    //IF THE SQAURE EXIST:
+    if(x-1 >= 0) square((x-1)*tileSize, y*tileSize, tileSize);
+    if(y-1 >= 0) square(x*tileSize, (y-1)*tileSize, tileSize);
+    if(x+1 <= width) square((x+1)*tileSize, y*tileSize, tileSize);
+    if(y+1 <= height) square(x*tileSize, (y+1)*tileSize, tileSize);
+    }
+
 }

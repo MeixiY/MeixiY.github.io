@@ -15,19 +15,21 @@ function preload(){
 
 function setup() {
   createCanvas(image1.width, image1.height);
+  angleMode(DEGREES);
 }
 
 function draw() {
   background(220);
-  //image(image1, 0, 0);
+  image(image1, 0, 0);
   //image(image2, 0, 0);
   //image(image3, 0, 0);
-  image(image4, 0, 0);
+  //image(image4, 0, 0);
 
   loadPixels();
-  //setColor();
+  setColor();
   //noGreen();
   //fiveColor(); 
+  //grabHalf();
   updatePixels();
 }
 
@@ -116,5 +118,19 @@ function fiveColor(){
 
 
 function grabHalf(){
-  
+  for(let x = 0; x < width; x++){
+    for(let y = 0; y < height; y++){
+      let i = ((y*width + x))*4;
+      let r = pixels[i];
+      let g = pixels[i+1];
+      let b = pixels[i+2];
+
+      if(x > width/2){
+        let target = ((y*width + (width-1-x)))*4;
+        pixels[target] = r;
+        pixels[target+1] = g;
+        pixels[target+2] = b;
+      }
+    }
+  }
 }

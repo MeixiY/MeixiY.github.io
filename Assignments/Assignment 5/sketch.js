@@ -2,31 +2,31 @@
 // Meixi Yao
 // April 24, 2026
 
+
+// globals for images
 let image1, image2, image3, image4;
 
+// load images
 function preload(){
   image1 = loadImage("assets/chip.jpg");
   image2 = loadImage("assets/race.jpg");
   image3 = loadImage("assets/nuit.jpg");
   image4 = loadImage("assets/hand.jpg");
-
- 
 }
 
 function setup() {
   createCanvas(image1.width, image1.height);
-  angleMode(DEGREES);
 }
 
 function draw() {
   background(220);
-  image(image1, 0, 0);
+  //image(image1, 0, 0);
   //image(image2, 0, 0);
   //image(image3, 0, 0);
   //image(image4, 0, 0);
 
   loadPixels();
-  setColor();
+  //setColor();
   //noGreen();
   //fiveColor(); 
   //grabHalf();
@@ -34,15 +34,19 @@ function draw() {
 }
 
 
+// Change all colors to red, green, or blue
 function setColor(){
+    //get rgb value of each pixel
     for(let x = 0; x < width; x++){
       for(let y = 0; y < height; y++){
         let i = ((y*width + x))*4;
-        let r = pixels[i];
+        let r = pixels[i];          
         let g = pixels[i+1];
         let b = pixels[i+2];
 
-        if(r >= g && r >= b){
+        // compare rgb
+        //e.g. if r is greater, set color to red
+        if(r >= g && r >= b){  
           pixels[i] = 255;
           pixels[i+1] = 0;
           pixels[i+2] = 0;
@@ -62,6 +66,7 @@ function setColor(){
 }
 
 
+// no green on right side
 function noGreen(){
   for(let x = 0; x < width; x++){
     for(let y = 0; y < height; y++){
@@ -74,15 +79,18 @@ function noGreen(){
 }
 
 
+// five colors only
 function fiveColor(){
+  //get rgb of each pixel
   for(let x = 0; x < width; x++){
     for(let y = 0; y < height; y++){
       let i = ((y*width + x))*4;
       let r = pixels[i];
       let g = pixels[i+1];
       let b = pixels[i+2];
-      let avg = (r+g+b)/3;
+      let avg = (r+g+b)/3;  // find average
 
+      //choose color based on average
       if(avg >= 205 && avg <= 255){
         pixels[i] = 170;
         pixels[i+1] = 230;
@@ -117,7 +125,9 @@ function fiveColor(){
 }
 
 
+// reflect right half of the image on the left side
 function grabHalf(){
+  // get the rgb values of each pixel
   for(let x = 0; x < width; x++){
     for(let y = 0; y < height; y++){
       let i = ((y*width + x))*4;
@@ -125,6 +135,8 @@ function grabHalf(){
       let g = pixels[i+1];
       let b = pixels[i+2];
 
+      //if the pixel is on the right, copy it to the target
+      // target = width - currentX
       if(x > width/2){
         let target = ((y*width + (width-1-x)))*4;
         pixels[target] = r;

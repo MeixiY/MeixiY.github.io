@@ -10,7 +10,7 @@ strawberry, vanilla, cone, cup;
 
 let vertices = [];
 let px, py;
-
+let container = 0;    //0-no container, 1-cone, 2-cup
 
 function preload(){
   bg = loadImage("assets/bg.png");
@@ -34,33 +34,26 @@ function setup() {
   vertices.push(createVector(50, height/2-33));
   vertices.push(createVector(105, height/2+200));
   vertices.push(createVector(0, height/2+205));
-  px = mouseX;
-  py = mouseY;
-  //cx1 = 0;       cy1 = height/2 - 25;
-  //cx2 = cx1+50; cy2 = cy1-8;
-  //cx3 = cx1+105; cy3 = cy1+225;
-  //cx4 = cx1;       cy4 = cy1+230;
+  
 }
+
 
 function draw() {
   image(bg, 0, 0);
-  addCone(cx1,cy1, cx2,cy2, cx3,cy3, cx4,cy4);
+  image(chalkboard, -230, -200);
+  addCone(vertices, mouseX, mouseY);
+  if(container === 1){
+    image(cone, width/2+150, height/2-355);
+  }
+  
 }
 
 
-function addCone(x1,y1, x2,y2, x3,y3, x4,y4){
+function addCone(vertices, px, py){
   noFill();
-  //push()
-  //rotate(348);
-  //translate(-150,-36);
-  //quad(x1,y1, x2,y2, x3,y3, x4,y4);
-  //if(mouseX > x &&
-   // mouseX < x+w &&
-    //mouseY > y &&
-    //mouseY < y+h){
-      
-    //}
-  //pop();
+  noStroke();
+  quad(0, height/2-25, 50, height/2-33, 105, height/2+200, 0, height/2+205);
+
   let collision = false;
   let next = 0;
   for(let current = 0; current < vertices.length; current++){
@@ -69,9 +62,19 @@ function addCone(x1,y1, x2,y2, x3,y3, x4,y4){
     let vc = vertices[current];
     let vn = vertices[next];
 
-    if(((vc.y > py) !== (vn.y > py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
-      collision = !collision
+    if(((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
+      collision = !collision;
     }
   }
+  //print(collision);
   return collision;
+}
+
+
+
+
+function mousePressed(){
+  if(addCone(vertices, mouseX, mouseY)){
+    container = 1;
+  }
 }

@@ -9,7 +9,11 @@ let bg, chalkboard, bubblegum, butter, chocolate, cookies, mango, mint,
 strawberry, vanilla, cone, cup;
 
 let vertices = [];
+let order = [];
+let correctOrder = [];
 let px, py;
+let scoopNum;
+let coneOrCup;
 let container = 0;    //0-no container, 1-cone, 2-cup
 
 function preload(){
@@ -34,6 +38,9 @@ function setup() {
   vertices.push(createVector(50, height/2-33));
   vertices.push(createVector(105, height/2+200));
   vertices.push(createVector(0, height/2+205));
+  //stroke(255);
+  generateOrder();
+
   
 }
 
@@ -41,11 +48,53 @@ function setup() {
 function draw() {
   image(bg, 0, 0);
   image(chalkboard, -230, -200);
+  addCup();
+  drawOrder();
   addCone(vertices, mouseX, mouseY);
+  addCup(mouseX, mouseY, width-90, height-300, 90, 200);
   if(container === 1){
     image(cone, width/2+150, height/2-355);
   }
+  else if(container === 2){
+    image(cup, width/2+100, height/2-240);
+  }
+}
+
+function generateOrder(){
+  scoopNum = Math.round(random(0.5, 3.5));
+  coneOrCup = random(["cone", "cup"]);
+  correctOrder[0] = coneOrCup;
+
+  if(scoopNum >= 1){
+    let flavor1 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    correctOrder[1] = flavor1;
+  }
+  if(scoopNum >= 2){
+    let flavor2 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    correctOrder[2] = flavor2;
+  }
+  if(scoopNum >= 3){
+    let flavor3 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    correctOrder[3] = flavor3;
+  }
+}
+
+function drawOrder(){
+  stroke(255);
+  textSize(20);
+  text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 260);
+  if(scoopNum >= 1){
+    text("1. " + correctOrder[1], 440, 290);
+  }
   
+  if(scoopNum >= 2){
+    text("2. "+ correctOrder[2], 440, 320);
+  }
+
+  if(scoopNum >= 3){
+    text("3. " + correctOrder[3], 440, 350);
+  }
+
 }
 
 
@@ -70,11 +119,31 @@ function addCone(vertices, px, py){
   return collision;
 }
 
+function addCup(px, py, rx, ry, rw, rh){
+  noFill();
+  noStroke();
+  rect(width-90, height-300, 90, 200);
+  if (px >= rx &&        // right of the left edge AND
+      px <= rx + rw &&   // left of the right edge AND
+      py >= ry &&        // below the top AND
+      py <= ry + rh) {   // above the bottom
+        return true;
+  }
+  else return false;
+}
+
+
 
 
 
 function mousePressed(){
   if(addCone(vertices, mouseX, mouseY)){
     container = 1;
+    order[0] = 1;
+  }
+
+  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200)){
+    container = 2;
+    order[0] = 2;
   }
 }

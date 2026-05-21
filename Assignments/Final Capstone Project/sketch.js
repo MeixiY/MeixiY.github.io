@@ -38,26 +38,18 @@ function setup() {
   vertices.push(createVector(50, height/2-33));
   vertices.push(createVector(105, height/2+200));
   vertices.push(createVector(0, height/2+205));
-  //stroke(255);
   generateOrder();
-
-  
 }
 
 
 function draw() {
   image(bg, 0, 0);
   image(chalkboard, -230, -200);
-  addCup();
-  drawOrder();
+  writeOrder(mouseX, mouseY, 493, 360, 100, 25);
   addCone(vertices, mouseX, mouseY);
   addCup(mouseX, mouseY, width-90, height-300, 90, 200);
-  if(container === 1){
-    image(cone, width/2+150, height/2-355);
-  }
-  else if(container === 2){
-    image(cup, width/2+100, height/2-240);
-  }
+  addVanilla();
+  drawOrder();
 }
 
 function generateOrder(){
@@ -80,21 +72,43 @@ function generateOrder(){
 }
 
 function drawOrder(){
+  if(container === 1){
+    image(cone, width/2+150, height/2-355);
+  }
+  else if(container === 2){
+    image(cup, width/2+100, height/2-240);
+  }
+}
+
+function writeOrder(px, py, rx, ry, rw, rh){
   stroke(255);
   textSize(20);
-  text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 260);
+  fill(255);
+  text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 250);
   if(scoopNum >= 1){
-    text("1. " + correctOrder[1], 440, 290);
+    text("1. " + correctOrder[1], 440, 280);
   }
   
   if(scoopNum >= 2){
-    text("2. "+ correctOrder[2], 440, 320);
+    text("2. "+ correctOrder[2], 440, 310);
   }
 
   if(scoopNum >= 3){
-    text("3. " + correctOrder[3], 440, 350);
+    text("3. " + correctOrder[3], 440, 340);
   }
 
+  fill(242, 212, 215);
+  rect(rx, ry, rw, rh, 4, 4, 4, 4);
+  fill(222, 93, 131);
+  text("Done!", 514, 380);
+
+  if (px >= rx &&        // right of the left edge AND
+      px <= rx + rw &&   // left of the right edge AND
+      py >= ry &&        // below the top AND
+      py <= ry + rh) {   // above the bottom
+        return true;
+  }
+  else return false;
 }
 
 
@@ -122,7 +136,7 @@ function addCone(vertices, px, py){
 function addCup(px, py, rx, ry, rw, rh){
   noFill();
   noStroke();
-  rect(width-90, height-300, 90, 200);
+  rect(rx, ry, rw, rh);
   if (px >= rx &&        // right of the left edge AND
       px <= rx + rw &&   // left of the right edge AND
       py >= ry &&        // below the top AND
@@ -132,11 +146,21 @@ function addCup(px, py, rx, ry, rw, rh){
   else return false;
 }
 
+function addVanilla(){
+  noFill();
+  stroke(1);
+  rect(300, 500, 200, 200);
+}
+
 
 
 
 
 function mousePressed(){
+  if(writeOrder(mouseX, mouseY, 493, 360, 100, 25)){
+    generateOrder();
+  }
+
   if(addCone(vertices, mouseX, mouseY)){
     container = 1;
     order[0] = 1;

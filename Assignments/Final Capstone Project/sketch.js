@@ -9,6 +9,8 @@ let bg, chalkboard, bubblegum, butter, chocolate, cookies, mango, mint,
 strawberry, vanilla, cone, cup;
 
 let vertices = [];
+let verticesV = [];
+let verticesChoco = [];
 let order = [];
 let correctOrder = [];
 let px, py;
@@ -38,6 +40,16 @@ function setup() {
   vertices.push(createVector(50, height/2-33));
   vertices.push(createVector(105, height/2+200));
   vertices.push(createVector(0, height/2+205));
+
+  verticesV.push(createVector(295, 580));
+  verticesV.push(createVector(520, 580));
+  verticesV.push(createVector(469, 715));
+  verticesV.push(createVector(215, 715));
+
+  verticesChoco.push(createVector(555, 583));
+  verticesChoco.push(createVector(770, 583));
+  verticesChoco.push(createVector(769, 715));
+  verticesChoco.push(createVector(500, 715));
   generateOrder();
 }
 
@@ -48,7 +60,8 @@ function draw() {
   writeOrder(mouseX, mouseY, 493, 360, 100, 25);
   addCone(vertices, mouseX, mouseY);
   addCup(mouseX, mouseY, width-90, height-300, 90, 200);
-  addVanilla();
+  addVanilla(verticesV, mouseX, mouseY);
+  addChocolate(verticesChoco, mouseX,mouseY);
   drawOrder();
 }
 
@@ -74,10 +87,23 @@ function generateOrder(){
 function drawOrder(){
   if(container === 1){
     image(cone, width/2+150, height/2-355);
-  }
+    }
   else if(container === 2){
     image(cup, width/2+100, height/2-240);
   }
+  for(let i = 1; i < order.length; i++){
+    if(i === 1 && container === 1){
+      image(order[i], width/2+195, height/2-309);
+    }
+    
+    if(i === 2 && container === 1){
+      image(order[i], width/2+195, height/2-374);
+    }
+
+    if(i === 3 && container === 1){
+      image(order[i], width/2+195, height/2-435);
+    }
+  } 
 }
 
 function writeOrder(px, py, rx, ry, rw, rh){
@@ -146,17 +172,60 @@ function addCup(px, py, rx, ry, rw, rh){
   else return false;
 }
 
-function addVanilla(){
+function addVanilla(vertices, px, py){
   noFill();
-  stroke(1);
-  rect(300, 500, 200, 200);
+  noStroke();
+  quad(295, 580, 520, 580, 469, 715, 215, 715);
+
+  let collision = false;
+  let next = 0;
+  for(let current = 0; current < vertices.length; current++){
+    next = current +1;
+    if(next === vertices.length) next = 0;
+    let vc = vertices[current];
+    let vn = vertices[next];
+
+    if(((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
+      collision = !collision;
+    }
+  }
+  //print(collision);
+  return collision;
+}
+
+function addChocolate(vertices, px, py){
+  noFill();
+  noStroke();
+  quad(555, 583, 770, 583, 769, 715, 500, 715);
+
+  let collision = false;
+  let next = 0;
+  for(let current = 0; current < vertices.length; current++){
+    next = current +1;
+    if(next === vertices.length) next = 0;
+    let vc = vertices[current];
+    let vn = vertices[next];
+
+    if(((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
+      collision = !collision;
+    }
+  }
+  //print(collision);
+  return collision;
 }
 
 
 
 
-
 function mousePressed(){
+  if(addChocolate(verticesChoco, mouseX, mouseY)){
+    order.push(chocolate);
+  }
+
+  if(addVanilla(verticesV, mouseX, mouseY)){
+    order.push(vanilla);
+  }
+
   if(writeOrder(mouseX, mouseY, 493, 360, 100, 25)){
     generateOrder();
   }

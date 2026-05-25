@@ -11,8 +11,10 @@ strawberry, vanilla, cone, cup;
 let vertices = [];
 let verticesV = [];
 let verticesChoco = [];
+let verticesStraw = [];
 let order = [];
 let correctOrder = [];
+let orderString = [];
 let px, py;
 let scoopNum;
 let coneOrCup;
@@ -50,6 +52,11 @@ function setup() {
   verticesChoco.push(createVector(770, 583));
   verticesChoco.push(createVector(769, 715));
   verticesChoco.push(createVector(500, 715));
+
+  verticesStraw.push(createVector(800, 580));
+  verticesStraw.push(createVector(1030, 580));
+  verticesStraw.push(createVector(1065, 715));
+  verticesStraw.push(createVector(800, 715));
   generateOrder();
 }
 
@@ -60,8 +67,9 @@ function draw() {
   writeOrder(mouseX, mouseY, 493, 360, 100, 25);
   addCone(vertices, mouseX, mouseY);
   addCup(mouseX, mouseY, width-90, height-300, 90, 200);
-  addVanilla(verticesV, mouseX, mouseY);
-  addChocolate(verticesChoco, mouseX,mouseY);
+  addScoop(verticesV, mouseX, mouseY);
+  addScoop(verticesChoco, mouseX,mouseY);
+  addScoop(verticesStraw, mouseX, mouseY);
   drawOrder();
 }
 
@@ -69,7 +77,7 @@ function generateOrder(){
   scoopNum = Math.round(random(0.5, 3.5));
   coneOrCup = random(["cone", "cup"]);
   correctOrder[0] = coneOrCup;
-
+  
   if(scoopNum >= 1){
     let flavor1 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
     correctOrder[1] = flavor1;
@@ -89,21 +97,34 @@ function drawOrder(){
     image(cone, width/2+150, height/2-355);
     }
   else if(container === 2){
-    image(cup, width/2+100, height/2-240);
+    image(cup, width/2+143, height/2-203);
   }
-  for(let i = 1; i < order.length; i++){
-    if(i === 1 && container === 1){
+  for(let i = 0; i < order.length; i++){
+    if(i === 0 && container === 1){
       image(order[i], width/2+195, height/2-309);
     }
     
-    if(i === 2 && container === 1){
+    if(i === 1 && container === 1){
       image(order[i], width/2+195, height/2-374);
     }
 
-    if(i === 3 && container === 1){
+    if(i === 2 && container === 1){
       image(order[i], width/2+195, height/2-435);
     }
-  } 
+ 
+
+    if(i === 0 && container === 2){
+        image(order[i], width/2+195, height/2-243);
+      }
+    
+    if(i === 1 && container === 2){
+      image(order[i], width/2+195, height/2-294);
+    }
+
+    if(i === 2 && container === 2){
+      image(order[i], width/2+195, height/2-345);
+    }
+  }
 }
 
 function writeOrder(px, py, rx, ry, rw, rh){
@@ -139,9 +160,9 @@ function writeOrder(px, py, rx, ry, rw, rh){
 
 
 function addCone(vertices, px, py){
-  noFill();
-  noStroke();
-  quad(0, height/2-25, 50, height/2-33, 105, height/2+200, 0, height/2+205);
+  //noFill();
+  //noStroke();
+  //quad(0, height/2-25, 50, height/2-33, 105, height/2+200, 0, height/2+205);
 
   let collision = false;
   let next = 0;
@@ -162,7 +183,7 @@ function addCone(vertices, px, py){
 function addCup(px, py, rx, ry, rw, rh){
   noFill();
   noStroke();
-  rect(rx, ry, rw, rh);
+  //rect(rx, ry, rw, rh);
   if (px >= rx &&        // right of the left edge AND
       px <= rx + rw &&   // left of the right edge AND
       py >= ry &&        // below the top AND
@@ -172,10 +193,10 @@ function addCup(px, py, rx, ry, rw, rh){
   else return false;
 }
 
-function addVanilla(vertices, px, py){
-  noFill();
-  noStroke();
-  quad(295, 580, 520, 580, 469, 715, 215, 715);
+function addScoop(vertices, px, py){
+  //noFill();
+ // noStroke();
+  //quad(295, 580, 520, 580, 469, 715, 215, 715);
 
   let collision = false;
   let next = 0;
@@ -192,38 +213,23 @@ function addVanilla(vertices, px, py){
   //print(collision);
   return collision;
 }
-
-function addChocolate(vertices, px, py){
-  noFill();
-  noStroke();
-  quad(555, 583, 770, 583, 769, 715, 500, 715);
-
-  let collision = false;
-  let next = 0;
-  for(let current = 0; current < vertices.length; current++){
-    next = current +1;
-    if(next === vertices.length) next = 0;
-    let vc = vertices[current];
-    let vn = vertices[next];
-
-    if(((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
-      collision = !collision;
-    }
-  }
-  //print(collision);
-  return collision;
-}
-
 
 
 
 function mousePressed(){
-  if(addChocolate(verticesChoco, mouseX, mouseY)){
-    order.push(chocolate);
+  if(addScoop(verticesStraw, mouseX, mouseY)){
+    order.push(strawberry);
+    orderString.push("Strawberry");
   }
 
-  if(addVanilla(verticesV, mouseX, mouseY)){
+  if(addScoop(verticesChoco, mouseX, mouseY)){
+    order.push(chocolate);
+    orderString.push("Chocolate")
+  }
+
+  if(addScoop(verticesV, mouseX, mouseY)){
     order.push(vanilla);
+    orderString.push("Vanilla");
   }
 
   if(writeOrder(mouseX, mouseY, 493, 360, 100, 25)){
@@ -232,11 +238,11 @@ function mousePressed(){
 
   if(addCone(vertices, mouseX, mouseY)){
     container = 1;
-    order[0] = 1;
+    orderString[0] = "cone";
   }
 
   if(addCup(mouseX, mouseY, width-90, height-300, 90, 200)){
     container = 2;
-    order[0] = 2;
+    orderString[0] = "cup";
   }
 }

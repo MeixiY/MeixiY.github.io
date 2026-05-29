@@ -12,6 +12,11 @@ let vertices = [];
 let verticesV = [];
 let verticesChoco = [];
 let verticesStraw = [];
+let verticesMint = [];
+let verticesCookies = [];
+let verticesButter = [];
+let verticesBubble = [];
+let verticesMango = [];
 let order = [];
 let correctOrder = [];
 let orderString = [];
@@ -57,6 +62,31 @@ function setup() {
   verticesStraw.push(createVector(1030, 580));
   verticesStraw.push(createVector(1065, 715));
   verticesStraw.push(createVector(800, 715));
+
+  verticesMint.push(createVector(1050, 580));
+  verticesMint.push(createVector(1275, 580));
+  verticesMint.push(createVector(1360, 715));
+  verticesMint.push(createVector(1095, 715));
+
+  verticesCookies.push(createVector(180, 760));
+  verticesCookies.push(createVector(454, 760));
+  verticesCookies.push(createVector(396, 947));
+  verticesCookies.push(createVector(145, 947));
+
+  verticesButter.push(createVector(485, 760));
+  verticesButter.push(createVector(766, 760));
+  verticesButter.push(createVector(766, 947));
+  verticesButter.push(createVector(435, 947));
+
+  verticesBubble.push(createVector(800, 760));
+  verticesBubble.push(createVector(1066, 760));
+  verticesBubble.push(createVector(1105, 947));
+  verticesBubble.push(createVector(800, 947));
+
+  verticesMango.push(createVector(1100, 760));
+  verticesMango.push(createVector(1350, 760));
+  verticesMango.push(createVector(1450, 947));
+  verticesMango.push(createVector(1150, 947));
   generateOrder();
 }
 
@@ -70,7 +100,14 @@ function draw() {
   addScoop(verticesV, mouseX, mouseY);
   addScoop(verticesChoco, mouseX,mouseY);
   addScoop(verticesStraw, mouseX, mouseY);
+  addScoop(verticesMint, mouseX, mouseY);
+  addScoop(verticesCookies, mouseX, mouseY);
+  addScoop(verticesButter, mouseX, mouseY);
+  addScoop(verticesBubble, mouseX, mouseY);
+  addScoop(verticesMango, mouseX, mouseY);
   drawOrder();
+  stroke(0);
+  //quad();
 }
 
 function generateOrder(){
@@ -214,25 +251,66 @@ function addScoop(vertices, px, py){
   return collision;
 }
 
+function checkOrder(){
+  if(orderString[0] === correctOrder[0]){
+    if(orderString[1] === correctOrder[1]){
+      if(orderString[2] === correctOrder[2]){
+        if(orderString[3] === correctOrder[3]){
+          return true;
+        }
+      }
+    }
+  }
+  else return false;
+}
 
 
 function mousePressed(){
-  if(addScoop(verticesStraw, mouseX, mouseY)){
+  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0){
+    order.push(mango);
+    orderString.push("Mango Sorbet");
+  }
+
+  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0){
+    order.push(bubblegum);
+    orderString.push("Bubblegum");
+  }
+  
+  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0){
+    order.push(butter);
+    orderString.push("Butter Pecan");
+  }
+
+  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0){
+    order.push(cookies);
+    orderString.push("Cookies&Cream");
+  }
+  
+  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0){
+    order.push(mint);
+    orderString.push("Mint Chip");
+  }
+
+  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0){
     order.push(strawberry);
     orderString.push("Strawberry");
   }
 
-  if(addScoop(verticesChoco, mouseX, mouseY)){
+  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0){
     order.push(chocolate);
     orderString.push("Chocolate")
   }
 
-  if(addScoop(verticesV, mouseX, mouseY)){
+  if(addScoop(verticesV, mouseX, mouseY) && container !== 0){
     order.push(vanilla);
     orderString.push("Vanilla");
   }
 
-  if(writeOrder(mouseX, mouseY, 493, 360, 100, 25)){
+  if(writeOrder(mouseX, mouseY, 493, 360, 100, 25) && checkOrder()){
+    order.length = 0;
+    orderString.length = 0;
+    correctOrder.length = 0;
+    container = 0;
     generateOrder();
   }
 

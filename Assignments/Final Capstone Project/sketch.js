@@ -23,6 +23,8 @@ let orderString = [];
 let px, py;
 let scoopNum;
 let coneOrCup;
+let currProfit;
+
 let container = 0;    //0-no container, 1-cone, 2-cup
 
 function preload(){
@@ -87,10 +89,10 @@ function setup() {
   verticesMango.push(createVector(1350, 760));
   verticesMango.push(createVector(1450, 947));
   verticesMango.push(createVector(1150, 947));
-  generateOrder();
+  //generateOrder();
 }
 
-
+currProfit = 0;
 function draw() {
   image(bg, 0, 0);
   image(chalkboard, -230, -200);
@@ -106,6 +108,7 @@ function draw() {
   addScoop(verticesBubble, mouseX, mouseY);
   addScoop(verticesMango, mouseX, mouseY);
   drawOrder();
+  displayProfit();
   stroke(0);
   //quad();
 }
@@ -166,26 +169,48 @@ function drawOrder(){
 
 function writeOrder(px, py, rx, ry, rw, rh){
   stroke(255);
-  textSize(20);
+  strokeWeight(0);
+  textSize(18);
   fill(255);
-  text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 250);
-  if(scoopNum >= 1){
-    text("1. " + correctOrder[1], 440, 280);
+  if(correctOrder[0] !== undefined){
+    text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 250);
+    
+    if(scoopNum >= 1){
+      text("1. " + correctOrder[1], 440, 280);
+    }
+    
+    if(scoopNum >= 2){
+      text("2. "+ correctOrder[2], 440, 310);
+    }
+
+    if(scoopNum >= 3){
+      text("3. " + correctOrder[3], 440, 340);
+    }
+  
+
+    fill(242, 212, 215);
+    rect(rx, ry, rw, rh, 4, 4, 4, 4);
+    fill(222, 93, 131);
+    text("Done!", 517, 379);
+  }
+  else{
+    
+    strokeWeight(0.5);
+    text("Create the given order", 448, 240)
+    strokeWeight(0);
+    textSize(17);
+    text("- Click the corresponding object to", 415, 270);
+    text("add a cone, cup, or a scoop", 428, 288);
+    text("- Press left arrow to undo", 415, 313);
+    text("- Click 'Done!' to complete", 415, 340);
+
+    fill(242, 212, 215);
+    rect(rx, ry, rw, rh, 4, 4, 4, 4);
+    fill(222, 93, 131);
+    textSize(18);
+    text("Start!", 520, 379);
   }
   
-  if(scoopNum >= 2){
-    text("2. "+ correctOrder[2], 440, 310);
-  }
-
-  if(scoopNum >= 3){
-    text("3. " + correctOrder[3], 440, 340);
-  }
-
-  fill(242, 212, 215);
-  rect(rx, ry, rw, rh, 4, 4, 4, 4);
-  fill(222, 93, 131);
-  text("Done!", 514, 380);
-
   if (px >= rx &&        // right of the left edge AND
       px <= rx + rw &&   // left of the right edge AND
       py >= ry &&        // below the top AND
@@ -264,46 +289,69 @@ function checkOrder(){
   else return false;
 }
 
+function displayProfit(){
+  fill("pink");
+  strokeWeight(2);
+  stroke(227, 28, 121);
+  rect(width-180, 40, 160, 50);
+  text("Profit: $ " + currProfit, width-170, 70);
+}
+
+function keyPressed(){
+  if(keyCode === LEFT_ARROW){
+    order.pop();
+    orderString.pop();
+    currProfit -= 2;
+  }
+}
 
 function mousePressed(){
   if(addScoop(verticesMango, mouseX, mouseY) && container !== 0){
     order.push(mango);
     orderString.push("Mango Sorbet");
+    currProfit += 2;
   }
 
   if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0){
     order.push(bubblegum);
     orderString.push("Bubblegum");
+    currProfit += 2;
   }
   
   if(addScoop(verticesButter, mouseX, mouseY) && container !== 0){
     order.push(butter);
     orderString.push("Butter Pecan");
+    currProfit += 2;
   }
 
   if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0){
     order.push(cookies);
     orderString.push("Cookies&Cream");
+    currProfit += 2;
   }
   
   if(addScoop(verticesMint, mouseX, mouseY) && container !== 0){
     order.push(mint);
     orderString.push("Mint Chip");
+    currProfit += 2;
   }
 
   if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0){
     order.push(strawberry);
     orderString.push("Strawberry");
+    currProfit += 2;
   }
 
   if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0){
     order.push(chocolate);
-    orderString.push("Chocolate")
+    orderString.push("Chocolate");
+    currProfit += 2;
   }
 
   if(addScoop(verticesV, mouseX, mouseY) && container !== 0){
     order.push(vanilla);
     orderString.push("Vanilla");
+    currProfit += 2;
   }
 
   if(writeOrder(mouseX, mouseY, 493, 360, 100, 25) && checkOrder()){
@@ -314,13 +362,15 @@ function mousePressed(){
     generateOrder();
   }
 
-  if(addCone(vertices, mouseX, mouseY)){
+  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined){
     container = 1;
     orderString[0] = "cone";
+    currProfit += 1;
   }
 
-  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200)){
+  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined){
     container = 2;
     orderString[0] = "cup";
+    currProfit += 0.5;
   }
 }

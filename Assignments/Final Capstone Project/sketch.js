@@ -20,10 +20,13 @@ let verticesMango = [];
 let order = [];
 let correctOrder = [];
 let orderString = [];
+let restartArray = [];
 let px, py;
 let scoopNum;
 let coneOrCup;
 let currProfit;
+let totalProfit;
+let containerPrice;
 
 let container = 0;    //0-no container, 1-cone, 2-cup
 
@@ -90,6 +93,8 @@ function setup() {
   verticesMango.push(createVector(1450, 947));
   verticesMango.push(createVector(1150, 947));
   //generateOrder();
+  totalProfit = 0;
+  containerPrice = 0;
 }
 
 currProfit = 0;
@@ -110,6 +115,8 @@ function draw() {
   drawOrder();
   displayProfit();
   stroke(0);
+  restart();
+  reset(restartArray[0], restartArray[1], restartArray[2], restartArray[3]);
   //quad();
 }
 
@@ -293,62 +300,95 @@ function displayProfit(){
   fill("pink");
   strokeWeight(2);
   stroke(227, 28, 121);
-  rect(width-180, 40, 160, 50);
-  text("Profit: $ " + currProfit, width-170, 70);
+  rect(width-200, 40, 160, 50, 5, 5, 5, 5);
+  text("Profit: $ " + totalProfit, width-170, 70);
 }
 
 function keyPressed(){
-  if(keyCode === LEFT_ARROW){
+  if(keyCode === LEFT_ARROW && order.length > 0){
     order.pop();
     orderString.pop();
     currProfit -= 2;
   }
 }
 
+function reset(x, y, w, h){
+   if(totalProfit < 0 && restartArray[0] !== undefined){
+      fill("pink");
+      textSize(60);
+      stroke(227, 28, 121);
+      rect(x, y, w, h, 10, 10, 10, 10);
+      strokeWeight(3);
+      text("GAME OVER", 607, 390);
+      textSize(20);
+      text("Click to Restart", 720, 430)
+    }
+}
+
+function restart(){
+  if(totalProfit < 0){
+    restartArray[0] = width/2-175;
+    restartArray[1] = height/2-200;
+    restartArray[2] = 400;
+    restartArray[3] = 150;
+  }
+}
+
 function mousePressed(){
-  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0){
+  if(writeOrder(mouseX, mouseY, width/2-200, height/2-200, 400, 150)){
+    order.length = 0;
+    orderString.length = 0;
+    correctOrder.length = 0;
+    restartArray.length = 0;
+    container = 0;
+    currProfit = 0;
+    totalProfit = 0;
+    containerPrice = 0;
+  }
+
+  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(mango);
     orderString.push("Mango Sorbet");
     currProfit += 2;
   }
 
-  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(bubblegum);
     orderString.push("Bubblegum");
     currProfit += 2;
   }
   
-  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(butter);
     orderString.push("Butter Pecan");
     currProfit += 2;
   }
 
-  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(cookies);
     orderString.push("Cookies&Cream");
     currProfit += 2;
   }
   
-  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(mint);
     orderString.push("Mint Chip");
     currProfit += 2;
   }
 
-  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(strawberry);
     orderString.push("Strawberry");
     currProfit += 2;
   }
 
-  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(chocolate);
     orderString.push("Chocolate");
     currProfit += 2;
   }
 
-  if(addScoop(verticesV, mouseX, mouseY) && container !== 0){
+  if(addScoop(verticesV, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(vanilla);
     orderString.push("Vanilla");
     currProfit += 2;
@@ -359,18 +399,37 @@ function mousePressed(){
     orderString.length = 0;
     correctOrder.length = 0;
     container = 0;
+    totalProfit = totalProfit + currProfit;
+    currProfit = 0;
+    containerPrice = 0;
     generateOrder();
   }
-
-  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined){
-    container = 1;
-    orderString[0] = "cone";
-    currProfit += 1;
+  else if(writeOrder(mouseX, mouseY, 493, 360, 100, 25) && !checkOrder()){
+    totalProfit -= 50;
   }
 
-  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined){
+  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && totalProfit >= 0){
+    container = 1;
+    orderString[0] = "cone";
+    containerPrice += 1;
+    if(containerPrice > 1){
+      currProfit = currProfit + 1 - (containerPrice - 1)*0.5;
+    }
+    else{
+      currProfit += 1;
+    }
+    
+  }
+
+  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && totalProfit >= 0){
     container = 2;
     orderString[0] = "cup";
-    currProfit += 0.5;
+    containerPrice += 1;
+    if(containerPrice > 1){
+      currProfit = currProfit + 0.5 - (containerPrice - 1);
+    }
+    else{
+      currProfit += 0.5;
+    }
   }
 }

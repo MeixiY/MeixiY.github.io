@@ -1,13 +1,13 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// Capstone Final Project - Ice Cream Shop
+// Meixi Yao
+// May 11th, 2026
 
+
+//Globals - Variables for flavours
 let bg, chalkboard, bubblegum, butter, chocolate, cookies, mango, mint,
 strawberry, vanilla, cone, cup;
 
+//Globals - Arrays (for click region, keeping track of orders)
 let vertices = [];
 let verticesV = [];
 let verticesChoco = [];
@@ -21,15 +21,27 @@ let order = [];
 let correctOrder = [];
 let orderString = [];
 let restartArray = [];
-let px, py;
+//let px, py;
+
+//Globals - Variables for keeping track of states and numbers
 let scoopNum;
-let coneOrCup;
+let checkRestart = false;
 let currProfit;
 let totalProfit;
-let containerPrice;
-
+let coneClick;
+let cupClick;
 let container = 0;    //0-no container, 1-cone, 2-cup
 
+//Globals - Variable for music
+let bgMusic;
+
+//Globals - Variables for timer
+let startTime = 0;
+let maxTime;
+let time;
+
+
+// Loads images and music
 function preload(){
   bg = loadImage("assets/bg.png");
   chalkboard = loadImage("assets/chalkboard.png");
@@ -43,11 +55,15 @@ function preload(){
   vanilla = loadImage("assets/vanilla.png");
   cone = loadImage("assets/cone.png");
   cup = loadImage("assets/cup.png");
+
+  //bgMusic = loadSound("assets/music.mp3");
 }
 
 function setup() {
   createCanvas(bg.width, bg.height);
-  angleMode(DEGREES);
+  //angleMode(DEGREES);
+
+  //Push in boundaries for collision test (click regions)
   vertices.push(createVector(0, height/2-25));
   vertices.push(createVector(50, height/2-33));
   vertices.push(createVector(105, height/2+200));
@@ -92,53 +108,73 @@ function setup() {
   verticesMango.push(createVector(1350, 760));
   verticesMango.push(createVector(1450, 947));
   verticesMango.push(createVector(1150, 947));
-  //generateOrder();
-  totalProfit = 0;
-  containerPrice = 0;
+
+  totalProfit = 0;    // starting value of these variables
+  coneClick = 0;
+  cupClick = 0;
+
+  //playSound();
 }
 
+// set this to 0 so that profit displays as a number to start
 currProfit = 0;
+
+// Background music
+function playSound(){
+  bgMusic.play();
+  bgMusic.loop();
+}
+
 function draw() {
   image(bg, 0, 0);
   image(chalkboard, -230, -200);
-  writeOrder(mouseX, mouseY, 493, 360, 100, 25);
-  addCone(vertices, mouseX, mouseY);
-  addCup(mouseX, mouseY, width-90, height-300, 90, 200);
-  addScoop(verticesV, mouseX, mouseY);
-  addScoop(verticesChoco, mouseX,mouseY);
-  addScoop(verticesStraw, mouseX, mouseY);
-  addScoop(verticesMint, mouseX, mouseY);
-  addScoop(verticesCookies, mouseX, mouseY);
-  addScoop(verticesButter, mouseX, mouseY);
-  addScoop(verticesBubble, mouseX, mouseY);
-  addScoop(verticesMango, mouseX, mouseY);
+  writeOrder(493, 360, 100, 25); 
   drawOrder();
   displayProfit();
+  timer();
   stroke(0);
   restart();
   reset(restartArray[0], restartArray[1], restartArray[2], restartArray[3]);
-  //quad();
 }
 
+
+function timer(){
+  let elapsedTime = (millis() - startTime)/1000; 
+  time = (maxTime - elapsedTime).toFixed(0);
+  if(time <= 0){
+    time = 0;
+  }
+  stroke(227, 28, 121);
+  rect(width-200, 100, 160, 50, 5, 5, 5, 5);
+  text("Time:", width-167, 133)
+  if(maxTime !== undefined){
+    text(time, width-115, 133);
+  }
+}
+
+//Generates random order and stores in an array
 function generateOrder(){
   scoopNum = Math.round(random(0.5, 3.5));
-  coneOrCup = random(["cone", "cup"]);
-  correctOrder[0] = coneOrCup;
+  correctOrder[0] = random(["cone", "cup"]);
   
   if(scoopNum >= 1){
-    let flavor1 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    correctOrder[1] = flavor1;
+    correctOrder[1] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    maxTime = 3;
   }
+
   if(scoopNum >= 2){
-    let flavor2 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    correctOrder[2] = flavor2;
+    correctOrder[2] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    maxTime = 5;
   }
+
   if(scoopNum >= 3){
-    let flavor3 = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    correctOrder[3] = flavor3;
+    correctOrder[3] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
+    maxTime = 7;
   }
 }
 
+
+// Displays what the user clicks/creates
 function drawOrder(){
   if(container === 1){
     image(cone, width/2+150, height/2-355);
@@ -146,7 +182,11 @@ function drawOrder(){
   else if(container === 2){
     image(cup, width/2+143, height/2-203);
   }
+
+  // loop through each item of what the user clicked
   for(let i = 0; i < order.length; i++){
+
+    //if the container is a cone, use these coordinates
     if(i === 0 && container === 1){
       image(order[i], width/2+195, height/2-309);
     }
@@ -159,7 +199,7 @@ function drawOrder(){
       image(order[i], width/2+195, height/2-435);
     }
  
-
+    //if the container is a cup, use these coordinates
     if(i === 0 && container === 2){
         image(order[i], width/2+195, height/2-243);
       }
@@ -174,13 +214,17 @@ function drawOrder(){
   }
 }
 
-function writeOrder(px, py, rx, ry, rw, rh){
+
+// Display the generated order (generateOrder()) on the board
+function writeOrder(rx, ry, rw, rh){
   stroke(255);
   strokeWeight(0);
   textSize(18);
   fill(255);
+
+  //second display after generateOrder() has been activated
   if(correctOrder[0] !== undefined){
-    text(scoopNum+" Scoop(s) in a " + coneOrCup, 410, 250);
+    text(scoopNum+" Scoop(s) in a " + correctOrder[0], 410, 250);
     
     if(scoopNum >= 1){
       text("1. " + correctOrder[1], 440, 280);
@@ -194,22 +238,22 @@ function writeOrder(px, py, rx, ry, rw, rh){
       text("3. " + correctOrder[3], 440, 340);
     }
   
-
     fill(242, 212, 215);
     rect(rx, ry, rw, rh, 4, 4, 4, 4);
     fill(222, 93, 131);
     text("Done!", 517, 379);
   }
-  else{
-    
+
+  //first display (instructions page) at the start when no order has been generated
+  else{  
     strokeWeight(0.5);
     text("Create the given order", 448, 240)
     strokeWeight(0);
     textSize(17);
-    text("- Click the corresponding object to", 415, 270);
-    text("add a cone, cup, or a scoop", 428, 288);
-    text("- Press left arrow to undo", 415, 313);
-    text("- Click 'Done!' to complete", 415, 340);
+    text("- Click the corresponding object to", 410, 270);
+    text("add a cone, cup, or a scoop", 423, 288);
+    text("- Press left arrow to undo", 410, 313);
+    text("- (-$50) per incorrect try, stay above 0!", 410, 340);
 
     fill(242, 212, 215);
     rect(rx, ry, rw, rh, 4, 4, 4, 4);
@@ -217,22 +261,25 @@ function writeOrder(px, py, rx, ry, rw, rh){
     textSize(18);
     text("Start!", 520, 379);
   }
-  
-  if (px >= rx &&        // right of the left edge AND
-      px <= rx + rw &&   // left of the right edge AND
-      py >= ry &&        // below the top AND
-      py <= ry + rh) {   // above the bottom
-        return true;
-  }
+}
+
+
+// Collision test for rectangle shapes (to create click region)
+function inRectangle(px, py, rx, ry, rw, rh){
+  if(px >= rx &&       // right of the left edge AND
+    px <= rx + rw &&   // left of the right edge AND
+    py >= ry &&        // below the top AND
+    py <= ry + rh){    // above the bottom
+      return true;
+    }
   else return false;
 }
 
 
-function addCone(vertices, px, py){
-  //noFill();
-  //noStroke();
-  //quad(0, height/2-25, 50, height/2-33, 105, height/2+200, 0, height/2+205);
 
+// function to add a cone
+function addCone(vertices, px, py){
+  //Uses quad-point collision
   let collision = false;
   let next = 0;
   for(let current = 0; current < vertices.length; current++){
@@ -245,14 +292,14 @@ function addCone(vertices, px, py){
       collision = !collision;
     }
   }
-  //print(collision);
   return collision;
 }
 
+
+// function to add a cup
 function addCup(px, py, rx, ry, rw, rh){
   noFill();
   noStroke();
-  //rect(rx, ry, rw, rh);
   if (px >= rx &&        // right of the left edge AND
       px <= rx + rw &&   // left of the right edge AND
       py >= ry &&        // below the top AND
@@ -262,11 +309,9 @@ function addCup(px, py, rx, ry, rw, rh){
   else return false;
 }
 
-function addScoop(vertices, px, py){
-  //noFill();
- // noStroke();
-  //quad(295, 580, 520, 580, 469, 715, 215, 715);
 
+// function to add a scoop
+function addScoop(vertices, px, py){
   let collision = false;
   let next = 0;
   for(let current = 0; current < vertices.length; current++){
@@ -279,10 +324,11 @@ function addScoop(vertices, px, py){
       collision = !collision;
     }
   }
-  //print(collision);
   return collision;
 }
 
+
+// compares what the user clicked (orderString) to the correct order
 function checkOrder(){
   if(orderString[0] === correctOrder[0]){
     if(orderString[1] === correctOrder[1]){
@@ -296,6 +342,8 @@ function checkOrder(){
   else return false;
 }
 
+
+// Displays what the user has made on the top right corner
 function displayProfit(){
   fill("pink");
   strokeWeight(2);
@@ -304,6 +352,8 @@ function displayProfit(){
   text("Profit: $ " + totalProfit, width-170, 70);
 }
 
+
+//Undo a scoop by clicking the left arrow
 function keyPressed(){
   if(keyCode === LEFT_ARROW && order.length > 0){
     order.pop();
@@ -312,30 +362,40 @@ function keyPressed(){
   }
 }
 
+
+// Display GAME OVER/Restart button when user's profit hits below 0
 function reset(x, y, w, h){
-   if(totalProfit < 0 && restartArray[0] !== undefined){
+   if(checkRestart === true){
       fill("pink");
       textSize(60);
       stroke(227, 28, 121);
       rect(x, y, w, h, 10, 10, 10, 10);
       strokeWeight(3);
-      text("GAME OVER", 607, 390);
+      text("GAME OVER", 617, 390);
       textSize(20);
-      text("Click to Restart", 720, 430)
+      text("Click to Restart", 730, 430)
     }
 }
 
+
+// Populate array that hold the coordinates for the restart button
 function restart(){
-  if(totalProfit < 0){
-    restartArray[0] = width/2-175;
+  if(totalProfit < 0 || time === 0){
+    restartArray[0] = width/2-165;
     restartArray[1] = height/2-200;
     restartArray[2] = 400;
     restartArray[3] = 150;
+
+    checkRestart = true;
   }
 }
 
+
+// Tests if each click region has been clicked
 function mousePressed(){
-  if(writeOrder(mouseX, mouseY, width/2-200, height/2-200, 400, 150)){
+
+  // Restart button
+  if(inRectangle(mouseX, mouseY, width/2-165, height/2-200, 400, 150) && checkRestart === true){
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
@@ -343,90 +403,114 @@ function mousePressed(){
     container = 0;
     currProfit = 0;
     totalProfit = 0;
-    containerPrice = 0;
+    coneClick = 0;
+    cupClick = 0;
+    time = undefined;
+    checkRestart = false;
   }
 
+  // Add Mango flavor
   if(addScoop(verticesMango, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(mango);
     orderString.push("Mango Sorbet");
     currProfit += 2;
   }
 
+  // Add bubblegum flavor
   if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(bubblegum);
     orderString.push("Bubblegum");
     currProfit += 2;
   }
   
+  // Add Butter Pecan flavor
   if(addScoop(verticesButter, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(butter);
     orderString.push("Butter Pecan");
     currProfit += 2;
   }
 
+  // Add Cookies & cream flavor
   if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(cookies);
     orderString.push("Cookies&Cream");
     currProfit += 2;
   }
   
+  // Add mint chip flavor
   if(addScoop(verticesMint, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(mint);
     orderString.push("Mint Chip");
     currProfit += 2;
   }
 
+  // Add strawberry flavor
   if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(strawberry);
     orderString.push("Strawberry");
     currProfit += 2;
   }
 
+  // Add chocolate flavor
   if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(chocolate);
     orderString.push("Chocolate");
     currProfit += 2;
   }
 
+  // Add Vanilla flavor
   if(addScoop(verticesV, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
     order.push(vanilla);
     orderString.push("Vanilla");
     currProfit += 2;
   }
 
-  if(writeOrder(mouseX, mouseY, 493, 360, 100, 25) && checkOrder()){
+  // Done button to procede to next order if the user is correct
+  if(checkOrder() && inRectangle(mouseX, mouseY, 493, 360, 100, 25)){
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
     container = 0;
+    startTime = millis();
     totalProfit = totalProfit + currProfit;
     currProfit = 0;
-    containerPrice = 0;
+    coneClick = 0;
+    cupClick = 0;
     generateOrder();
+    
   }
-  else if(writeOrder(mouseX, mouseY, 493, 360, 100, 25) && !checkOrder()){
+  // If the user is wrong, -$50 from profit
+  else if(inRectangle(mouseX, mouseY, 493, 360, 100, 25) && !checkOrder()){
     totalProfit -= 50;
   }
 
+  // Adds a cone
   if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && totalProfit >= 0){
     container = 1;
     orderString[0] = "cone";
-    containerPrice += 1;
-    if(containerPrice > 1){
-      currProfit = currProfit + 1 - (containerPrice - 1)*0.5;
+    
+    //logic to make sure the profit for cup and cone switches when changes and not
+    //added on top of each other
+    coneClick += 1;
+    if(cupClick > 0){                  
+      currProfit = currProfit + 1 - 0.5; 
     }
     else{
       currProfit += 1;
-    }
-    
+    } 
   }
 
+  // Adds a cup
   if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && totalProfit >= 0){
     container = 2;
     orderString[0] = "cup";
-    containerPrice += 1;
-    if(containerPrice > 1){
-      currProfit = currProfit + 0.5 - (containerPrice - 1);
+
+    //logic to make sure the profit for cup and cone switches when changes and not
+    //added on top of each other
+    cupClick += 1;
+    if(coneClick > 0){                    
+      currProfit = currProfit + 0.5 - 1;  
+      coneClick = 0;
     }
     else{
       currProfit += 0.5;

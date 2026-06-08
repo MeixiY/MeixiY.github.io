@@ -31,6 +31,8 @@ let totalProfit;
 let coneClick;
 let cupClick;
 let container = 0;    //0-no container, 1-cone, 2-cup
+let ordersMade = -1;
+let gradeLevel;
 
 //Globals - Variable for music
 let bgMusic;
@@ -56,7 +58,7 @@ function preload(){
   cone = loadImage("assets/cone.png");
   cup = loadImage("assets/cup.png");
 
-  //bgMusic = loadSound("assets/music.mp3");
+  bgMusic = loadSound("assets/music.mp3");
 }
 
 function setup() {
@@ -113,7 +115,7 @@ function setup() {
   coneClick = 0;
   cupClick = 0;
 
-  //playSound();
+  playSound();
 }
 
 // set this to 0 so that profit displays as a number to start
@@ -134,7 +136,7 @@ function draw() {
   timer();
   stroke(0);
   restart();
-  reset(restartArray[0], restartArray[1], restartArray[2], restartArray[3]);
+  reset();
 }
 
 
@@ -143,6 +145,9 @@ function timer(){
   time = (maxTime - elapsedTime).toFixed(0);
   if(time <= 0){
     time = 0;
+  }
+  if(totalProfit < 0){
+    maxTime = undefined;
   }
   stroke(227, 28, 121);
   rect(width-200, 100, 160, 50, 5, 5, 5, 5);
@@ -159,17 +164,17 @@ function generateOrder(){
   
   if(scoopNum >= 1){
     correctOrder[1] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 3;
+    maxTime = 4;    //time you have to make an order with one scoop
   }
 
   if(scoopNum >= 2){
     correctOrder[2] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 5;
+    maxTime = 6;    //time you have to make an order with two scoops
   }
 
   if(scoopNum >= 3){
     correctOrder[3] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 7;
+    maxTime = 8;    //time you have to make an order with three scoops
   }
 }
 
@@ -266,10 +271,10 @@ function writeOrder(rx, ry, rw, rh){
 
 // Collision test for rectangle shapes (to create click region)
 function inRectangle(px, py, rx, ry, rw, rh){
-  if(px >= rx &&       // right of the left edge AND
-    px <= rx + rw &&   // left of the right edge AND
-    py >= ry &&        // below the top AND
-    py <= ry + rh){    // above the bottom
+  if(px >= rx &&       // Check if mouse is: right of the left edge AND
+    px <= rx + rw &&                      // left of the right edge AND
+    py >= ry &&                           // below the top AND
+    py <= ry + rh){                       // above the bottom
       return true;
     }
   else return false;
@@ -299,7 +304,7 @@ function addCone(vertices, px, py){
 // function to add a cup
 function addCup(px, py, rx, ry, rw, rh){
   noFill();
-  noStroke();
+  noStroke();            // Check if mouse is:
   if (px >= rx &&        // right of the left edge AND
       px <= rx + rw &&   // left of the right edge AND
       py >= ry &&        // below the top AND
@@ -364,27 +369,44 @@ function keyPressed(){
 
 
 // Display GAME OVER/Restart button when user's profit hits below 0
-function reset(x, y, w, h){
+function reset(){
    if(checkRestart === true){
       fill("pink");
       textSize(60);
       stroke(227, 28, 121);
-      rect(x, y, w, h, 10, 10, 10, 10);
+      rect(width/2-165, height/2-300, 400, 350, 10, 10, 10, 10);
       strokeWeight(3);
-      text("GAME OVER", 617, 390);
+      text("GAME OVER", 617, 290);
+
+      if(totalProfit < 0){
+        textSize(20);
+        text("Profit hit below zero!", 710, 330);
+      }
+      else if(time <= 0){
+        textSize(20);
+        text("Time has ran out!", 720, 330);
+      }
+      text("Profit: $" + totalProfit, 730, 380);
+      text("Orders Completed: " + ordersMade, 730, 420);
+      text("Grade Level: " + gradeLevel, 730, 460);
       textSize(20);
-      text("Click to Restart", 730, 430)
+      fill(213, 134, 157);
+      rect(723, 510, 150, 40, 4, 4, 4, 4);
+      fill("pink");
+      text("Click to Restart", 730, 535);
     }
 }
 
 
-// Populate array that hold the coordinates for the restart button
+// Controls state to activate the restart button, calculates grade level
 function restart(){
   if(totalProfit < 0 || time === 0){
-    restartArray[0] = width/2-165;
-    restartArray[1] = height/2-200;
-    restartArray[2] = 400;
-    restartArray[3] = 150;
+    if(ordersMade > 20) gradeLevel = "A";
+    else if(ordersMade > 15) gradeLevel = "B";
+    else if(ordersMade > 10) gradeLevel = "C";
+    else if(ordersMade > 5) gradeLevel = "D";
+    else if(ordersMade > 0) gradeLevel = "E";
+    else if(ordersMade === 0) gradeLevel = "F";
 
     checkRestart = true;
   }
@@ -395,7 +417,7 @@ function restart(){
 function mousePressed(){
 
   // Restart button
-  if(inRectangle(mouseX, mouseY, width/2-165, height/2-200, 400, 150) && checkRestart === true){
+  if(inRectangle(mouseX, mouseY, 723, 510, 150, 40) && checkRestart === true){
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
@@ -405,68 +427,71 @@ function mousePressed(){
     totalProfit = 0;
     coneClick = 0;
     cupClick = 0;
-    time = undefined;
+    ordersMade = -1;
+    //timer();
+    maxTime = undefined;
+    print("restart")
     checkRestart = false;
   }
 
   // Add Mango flavor
-  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(mango);
     orderString.push("Mango Sorbet");
     currProfit += 2;
   }
 
   // Add bubblegum flavor
-  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(bubblegum);
     orderString.push("Bubblegum");
     currProfit += 2;
   }
   
   // Add Butter Pecan flavor
-  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(butter);
     orderString.push("Butter Pecan");
     currProfit += 2;
   }
 
   // Add Cookies & cream flavor
-  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(cookies);
     orderString.push("Cookies&Cream");
     currProfit += 2;
   }
   
   // Add mint chip flavor
-  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(mint);
     orderString.push("Mint Chip");
     currProfit += 2;
   }
 
   // Add strawberry flavor
-  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(strawberry);
     orderString.push("Strawberry");
     currProfit += 2;
   }
 
   // Add chocolate flavor
-  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(chocolate);
     orderString.push("Chocolate");
     currProfit += 2;
   }
 
   // Add Vanilla flavor
-  if(addScoop(verticesV, mouseX, mouseY) && container !== 0 && totalProfit >= 0){
+  if(addScoop(verticesV, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(vanilla);
     orderString.push("Vanilla");
     currProfit += 2;
   }
 
   // Done button to procede to next order if the user is correct
-  if(checkOrder() && inRectangle(mouseX, mouseY, 493, 360, 100, 25)){
+  if(checkOrder() && inRectangle(mouseX, mouseY, 493, 360, 100, 25) && checkRestart === false ){
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
@@ -477,15 +502,15 @@ function mousePressed(){
     coneClick = 0;
     cupClick = 0;
     generateOrder();
-    
+    ordersMade += 1;
   }
   // If the user is wrong, -$50 from profit
-  else if(inRectangle(mouseX, mouseY, 493, 360, 100, 25) && !checkOrder()){
+  else if(inRectangle(mouseX, mouseY, 493, 360, 100, 25) && !checkOrder() && checkRestart === false){
     totalProfit -= 50;
   }
 
   // Adds a cone
-  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && totalProfit >= 0){
+  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && checkRestart === false){
     container = 1;
     orderString[0] = "cone";
     
@@ -501,7 +526,7 @@ function mousePressed(){
   }
 
   // Adds a cup
-  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && totalProfit >= 0){
+  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && checkRestart === false){
     container = 2;
     orderString[0] = "cup";
 

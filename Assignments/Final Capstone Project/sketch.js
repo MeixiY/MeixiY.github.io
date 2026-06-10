@@ -130,6 +130,7 @@ function playSound(){
 function draw() {
   image(bg, 0, 0);
   image(chalkboard, -230, -200);
+  labels();
   writeOrder(493, 360, 100, 25); 
   drawOrder();
   displayProfit();
@@ -140,6 +141,20 @@ function draw() {
 }
 
 
+function labels(){
+  if(correctOrder[0] === undefined){
+    stroke(227, 28, 121);
+    textSize(20);
+    rect(5, height/2 + 130, 100, 45, 5, 5, 5, 5);
+    text("Cones", 25, height/2+159);
+    rect(width-105, height/2 + 330, 100, 45, 5, 5, 5, 5);
+    text("Cups", width-83, height/2+359);
+  }
+ 
+}
+
+
+// Keeps track of time allowed for each order
 function timer(){
   let elapsedTime = (millis() - startTime)/1000; 
   time = (maxTime - elapsedTime).toFixed(0);
@@ -164,17 +179,17 @@ function generateOrder(){
   
   if(scoopNum >= 1){
     correctOrder[1] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 4;    //time you have to make an order with one scoop
+    maxTime = 6;    //time you have to make an order with one scoop
   }
 
   if(scoopNum >= 2){
     correctOrder[2] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 6;    //time you have to make an order with two scoops
+    maxTime = 8;    //time you have to make an order with two scoops
   }
 
   if(scoopNum >= 3){
     correctOrder[3] = random(["Bubblegum", "Butter Pecan", "Chocolate", "Cookies&Cream", "Mango Sorbet", "Mint Chip", "Strawberry", "Vanilla"]);
-    maxTime = 8;    //time you have to make an order with three scoops
+    maxTime = 10;    //time you have to make an order with three scoops
   }
 }
 
@@ -428,9 +443,7 @@ function mousePressed(){
     coneClick = 0;
     cupClick = 0;
     ordersMade = -1;
-    //timer();
     maxTime = undefined;
-    print("restart")
     checkRestart = false;
   }
 

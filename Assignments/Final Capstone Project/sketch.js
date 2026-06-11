@@ -141,6 +141,7 @@ function draw() {
 }
 
 
+// Labels at the beginning of the game to tell users where the cup and cones are
 function labels(){
   if(correctOrder[0] === undefined){
     stroke(227, 28, 121);
@@ -285,6 +286,7 @@ function writeOrder(rx, ry, rw, rh){
 
 
 // Collision test for rectangle shapes (to create click region)
+// for adding a cups and button clicks
 function inRectangle(px, py, rx, ry, rw, rh){
   if(px >= rx &&       // Check if mouse is: right of the left edge AND
     px <= rx + rw &&                      // left of the right edge AND
@@ -297,41 +299,10 @@ function inRectangle(px, py, rx, ry, rw, rh){
 
 
 
-// function to add a cone
-function addCone(vertices, px, py){
+// function create a quad click region
+// for adding cone and scoops
+function inQuad(vertices, px, py){
   //Uses quad-point collision
-  let collision = false;
-  let next = 0;
-  for(let current = 0; current < vertices.length; current++){
-    next = current +1;
-    if(next === vertices.length) next = 0;
-    let vc = vertices[current];
-    let vn = vertices[next];
-
-    if(((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x - vc.x)*(py-vc.y)/(vn.y-vc.y) + vc.x)){
-      collision = !collision;
-    }
-  }
-  return collision;
-}
-
-
-// function to add a cup
-function addCup(px, py, rx, ry, rw, rh){
-  noFill();
-  noStroke();            // Check if mouse is:
-  if (px >= rx &&        // right of the left edge AND
-      px <= rx + rw &&   // left of the right edge AND
-      py >= ry &&        // below the top AND
-      py <= ry + rh) {   // above the bottom
-        return true;
-  }
-  else return false;
-}
-
-
-// function to add a scoop
-function addScoop(vertices, px, py){
   let collision = false;
   let next = 0;
   for(let current = 0; current < vertices.length; current++){
@@ -393,6 +364,7 @@ function reset(){
       strokeWeight(3);
       text("GAME OVER", 617, 290);
 
+      //Different displays depending on the reason for GAME OVER
       if(totalProfit < 0){
         textSize(20);
         text("Profit hit below zero!", 710, 330);
@@ -401,6 +373,8 @@ function reset(){
         textSize(20);
         text("Time has ran out!", 720, 330);
       }
+
+      //Reports performance
       text("Profit: $" + totalProfit, 730, 380);
       text("Orders Completed: " + ordersMade, 730, 420);
       text("Grade Level: " + gradeLevel, 730, 460);
@@ -433,6 +407,7 @@ function mousePressed(){
 
   // Restart button
   if(inRectangle(mouseX, mouseY, 723, 510, 150, 40) && checkRestart === true){
+    //Resets all values to its starting state
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
@@ -448,56 +423,56 @@ function mousePressed(){
   }
 
   // Add Mango flavor
-  if(addScoop(verticesMango, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesMango, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(mango);
     orderString.push("Mango Sorbet");
     currProfit += 2;
   }
 
   // Add bubblegum flavor
-  if(addScoop(verticesBubble, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesBubble, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(bubblegum);
     orderString.push("Bubblegum");
     currProfit += 2;
   }
   
   // Add Butter Pecan flavor
-  if(addScoop(verticesButter, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesButter, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(butter);
     orderString.push("Butter Pecan");
     currProfit += 2;
   }
 
   // Add Cookies & cream flavor
-  if(addScoop(verticesCookies, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesCookies, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(cookies);
     orderString.push("Cookies&Cream");
     currProfit += 2;
   }
   
   // Add mint chip flavor
-  if(addScoop(verticesMint, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesMint, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(mint);
     orderString.push("Mint Chip");
     currProfit += 2;
   }
 
   // Add strawberry flavor
-  if(addScoop(verticesStraw, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesStraw, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(strawberry);
     orderString.push("Strawberry");
     currProfit += 2;
   }
 
   // Add chocolate flavor
-  if(addScoop(verticesChoco, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesChoco, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(chocolate);
     orderString.push("Chocolate");
     currProfit += 2;
   }
 
   // Add Vanilla flavor
-  if(addScoop(verticesV, mouseX, mouseY) && container !== 0 && checkRestart === false){
+  if(inQuad(verticesV, mouseX, mouseY) && container !== 0 && checkRestart === false){
     order.push(vanilla);
     orderString.push("Vanilla");
     currProfit += 2;
@@ -505,6 +480,7 @@ function mousePressed(){
 
   // Done button to procede to next order if the user is correct
   if(checkOrder() && inRectangle(mouseX, mouseY, 493, 360, 100, 25) && checkRestart === false ){
+    //Resets temporary variables (only holds informations for the current order)
     order.length = 0;
     orderString.length = 0;
     correctOrder.length = 0;
@@ -523,7 +499,7 @@ function mousePressed(){
   }
 
   // Adds a cone
-  if(addCone(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && checkRestart === false){
+  if(inQuad(vertices, mouseX, mouseY) && correctOrder[0] !== undefined && checkRestart === false){
     container = 1;
     orderString[0] = "cone";
     
@@ -539,7 +515,7 @@ function mousePressed(){
   }
 
   // Adds a cup
-  if(addCup(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && checkRestart === false){
+  if(inRectangle(mouseX, mouseY, width-90, height-300, 90, 200) && correctOrder[0] !== undefined && checkRestart === false){
     container = 2;
     orderString[0] = "cup";
 
